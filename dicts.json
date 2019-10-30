@@ -1,0 +1,14 @@
+{
+  "Subject": {
+    "file": "files/phs001062.v3.pht005261.v2.TOPMed_WGS_MGH_AF_Subject.data_dict.xml",
+    "link": null
+  },
+  "Sample": {
+    "file": "files/phs001062.v3.pht005262.v3.TOPMed_WGS_MGH_AF_Sample.data_dict.xml",
+    "link": "Subject"
+  },
+  "Sample_Attributes": {
+    "file": "files/phs001062.v3.pht005263.v2.TOPMed_WGS_MGH_AF_Sample_Attributes.data_dict.xml",
+    "link": "Sample"
+  }
+}

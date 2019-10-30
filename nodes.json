@@ -1,0 +1,14 @@
+{
+  "Subject": {
+    "file": "files/phs001062.v3.pht005261.v2.p2.TOPMed_WGS_MGH_AF_Subject.MULTI.txt",
+    "submitter_id": "dbGaP_Subject_ID"
+  },
+  "Sample": {
+    "file": "files/phs001062.v3.pht005262.v3.p2.TOPMed_WGS_MGH_AF_Sample.MULTI.txt",
+    "submitter_id": "dbGaP_Sample_ID"
+  },
+  "Sample_Attributes": {
+    "file": "files/phs001062.v3.pht005263.v2.p2.c2.TOPMed_WGS_MGH_AF_Sample_Attributes.DS-AF-IRB-RD.txt",
+    "submitter_id": "SAMPLE_ID"
+  }
+}
