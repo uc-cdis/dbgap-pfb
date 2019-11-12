@@ -64,9 +64,10 @@ files = glob.glob(fileFind)
 # load the default dictionary schema with study 
 dictionary = ""
 with open("default-schema.json", "r") as schema:
+	print("Reading default schema")
 	dictionary = json.loads(schema.read())
 
-
+print("Parsing dictionaries")
 for f in files:
 	# split the file name to get the node name
 	fileSections = f.replace(location,"").split('.')
@@ -95,12 +96,13 @@ for f in files:
 	dictLink["required"] = True
 	dictLink["target_type"] = "Study"
 	dictLink["label"] = "member_of"
-	
+
 	# append the links to the dictionary
 	dictionary[nodeName]["links"].append(dictLink)
 
 
 with open("dbgap-schema.json", "w+") as w:
+	print("Writing to dbgap-schema.json")
 	w.write(json.dumps(dictionary))
 # print(json.dumps(dictionary))
 
