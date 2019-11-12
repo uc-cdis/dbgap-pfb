@@ -1,3 +1,9 @@
+# repo specific files
+files/
+data/
+*.avro
+dbgap-schema.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
