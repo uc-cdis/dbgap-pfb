@@ -7,6 +7,7 @@ import argparse
 def parseOptions():
 	parser = argparse.ArgumentParser(description="parse the data dictionaries of unharmonized dbGaP studies")
 	parser.add_argument('-d', help="directory of dbGaP study", required=True)
+	parser.add_argument('-o', help="output file for pfb schema", required=True)
 	args = parser.parse_args()
 
 	return args
@@ -56,6 +57,7 @@ def parse_dbgap_dictionary(name, dictionary, filename):
 # parse the arguments for the directory of the dbGaP data
 args = parseOptions()
 location = args.d
+outputSchema = args.o
 
 # use glob to find all the data dictionary files
 fileFind = location + "*.data_dict.xml"
@@ -101,8 +103,8 @@ for f in files:
 	dictionary[nodeName]["links"].append(dictLink)
 
 
-with open("dbgap-schema.json", "w+") as w:
-	print("Writing to dbgap-schema.json")
+with open(outputSchema, "w+") as w:
+	print("Writing to " + outputSchema)
 	w.write(json.dumps(dictionary))
 # print(json.dumps(dictionary))
 
