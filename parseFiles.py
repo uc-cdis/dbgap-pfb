@@ -40,7 +40,7 @@ def parseSubjects(fileName, nodeName, consent, output):
 			elif header:
 				heads = line.replace('\n',"").split('\t')
 				for h in heads:
-					if "consent" in h.lower():
+					if "consent" in h.lower() or h.lower() == "gencons":
 						consent_var = h
 						break
 				heads.append("submitter_id")
@@ -57,12 +57,6 @@ def parseSubjects(fileName, nodeName, consent, output):
 				entity["studies"]["submitter_id"] = phs
 				if entity[consent_var] == str(consent):
 					nodeData.append(entity)
-		# ittr = 0
-		# while ittr < len(nodeData):
-		# 	if nodeData[ittr][consent_var] != str(consent):
-		# 		del nodeData[ittr]
-		# 	else:
-		# 		ittr += 1
 
 		# write the file for subject
 		writeFile = output + "/" + nodeName + ".json"
@@ -171,7 +165,8 @@ def parseDataFile(fileName, nodeName, output):
 		# write the file for all the nodes
 		writeFile = output + "/" + nodeName + ".json"
 		with open(writeFile, "w+") as o:
-			o.write(json.dumps(nodeData))
+			for chunk in json.JSONEncoder().iterencode(nodeData):
+				o.write(chunk)
 		return
 
 
