@@ -200,7 +200,7 @@ dataFiles = []
 for f in files:
 	dataFile = f.replace(location,"")
 	thing = dataFile.split('.')
-	if "c2" in thing[5]:
+	if "c" + str(consent) in thing[5]:
 		file = {}
 		file["fileName"] = f
 		file["nodeName"] = thing[6]
