@@ -60,7 +60,10 @@ location = args.d
 outputSchema = args.o
 
 # use glob to find all the data dictionary files
-fileFind = location + "*.data_dict.xml"
+if location.endswith("/"):
+	fileFind = location + "*.data_dict.xml"
+else:
+	fileFind = location + "/*.data_dict.xml"
 files = glob.glob(fileFind)
 
 # load the default dictionary schema with study 
