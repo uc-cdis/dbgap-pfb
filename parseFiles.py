@@ -40,7 +40,7 @@ def parseSubjects(fileName, nodeName, consent, output):
 			elif header:
 				heads = line.replace('\n',"").split('\t')
 				for h in heads:
-					if "consent" in h:
+					if "consent" in h.lower():
 						consent_var = h
 						break
 				heads.append("submitter_id")
@@ -183,8 +183,12 @@ consent = args.c
 output = args.o
 
 # use glob to find all files from location that are .txt.gz files
-fileFind = location + "*.txt.gz"
+if location.endswith("/"):
+	fileFind = location + "*.txt.gz"
+else:
+	fileFind = location + "/*.txt.gz"
 files = glob.glob(fileFind)
+
 
 print("Outputting to", output, "directory")
 
