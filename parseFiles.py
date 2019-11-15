@@ -34,7 +34,11 @@ def parseSubjects(fileName, nodeName, consent, output):
 		nodeData = []
 		consent_var = ""
 		for line in data:
-			line = line.decode("utf-8")
+			try:
+				line = line.decode("utf-8")
+			except Exception as e:
+				print("hey utf-8 didn't work so we are going to try iso")
+				line = line.decode('iso-8859-1')
 			if line[0] == "#" or len(line) < 2:
 				continue
 			elif header:
@@ -71,7 +75,11 @@ def parseSample(fileName, nodeName, subjects, output):
 		nodeData = []
 		subject_var = ""
 		for line in data:
-			line = line.decode("utf-8")
+			try:
+				line = line.decode("utf-8")
+			except Exception as e:
+				print("hey utf-8 didn't work so we are going to try iso")
+				line = line.decode('iso-8859-1')
 			if line[0] == "#" or len(line) < 2:
 				continue
 			elif header:
@@ -106,7 +114,11 @@ def parsePedigree(fileName, nodeName, subjects, output):
 		header = True
 		nodeData = []
 		for line in data:
-			line = line.decode("utf-8")
+			try:
+				line = line.decode("utf-8")
+			except Exception as e:
+				print("hey utf-8 didn't work so we are going to try iso")
+				line = line.decode('iso-8859-1')
 			if line[0] == "#" or len(line) < 2:
 				continue
 			elif header:
@@ -142,7 +154,11 @@ def parseDataFile(fileName, nodeName, output):
 		nodeData = []
 		subject_var = ""
 		for line in data:
-			line = line.decode("utf-8")
+			try:
+				line = line.decode("utf-8")
+			except Exception as e:
+				print("hey utf-8 didn't work so we are going to try iso")
+				line = line.decode('iso-8859-1')
 			if line[0] == "#" or len(line) < 2:
 				continue
 			elif header:
@@ -165,8 +181,9 @@ def parseDataFile(fileName, nodeName, output):
 		# write the file for all the nodes
 		writeFile = output + "/" + nodeName + ".json"
 		with open(writeFile, "w+") as o:
-			for chunk in json.JSONEncoder().iterencode(nodeData):
+			for chunk in json.JSONEncoder(indent=2).iterencode(nodeData):
 				o.write(chunk)
+			# o.write(json.dumps(nodeData))
 		return
 
 
