@@ -50,7 +50,20 @@ def parse_dbgap_dictionary(name, dictionary, filename):
 				props["properties"][item[0].text][tag] = value
 			props["properties"][item[0].text]["type"] = "string"
 
+		props["properties"]["dbGaP_Subject_ID"] = {}
+		props["properties"]["dbGaP_Subject_ID"]["description"] = "dbGaP subject variable"
+		props["properties"]["dbGaP_Subject_ID"]["type"] = "string"
+
+		props["properties"]["dbGaP_Sample_ID"] = {}
+		props["properties"]["dbGaP_Sample_ID"]["description"] = "dbGaP sample variable"
+		props["properties"]["dbGaP_Sample_ID"]["type"] = "string"
+
+		props["properties"]["BioSample Accession"] = {}
+		props["properties"]["BioSample Accession"]["description"] = "dbGaP BioSample Accession variable"
+		props["properties"]["BioSample Accession"]["type"] = "string"
+
 		dictionary[name] = props
+
 	return dictionary
 
 
