@@ -15,6 +15,29 @@ def parseOptions():
 
 	return args
 
+def writeProgramNode(output):
+	# writing node for program with name of dbGaP
+	programData = []
+	program = {}
+	program["type"] = "program"
+	program["submitter_id"] = "dbGaP"
+	programData.append(program)
+	fileName = output + "/program.json"
+	with open(fileName, "w+") as o:
+		o.write(json.dumps(programData))
+
+def writeProjectNode(phs, output):
+	# writing node for study with one phs number
+	projectData = []
+	project = {}
+	project["type"] = "project"
+	project["submitter_id"] = phs.split(".")[0]
+	project["programs"] = {}
+	project["programs"]["submitter_id"] = "dbGaP"
+	projectData.append(project)
+	fileName = output + "/project.json"
+	with open(fileName, "w+") as o:
+		o.write(json.dumps(projectData))
 
 def writeStudyNode(phs, output):
 	# writing node for study with one phs number
@@ -22,10 +45,13 @@ def writeStudyNode(phs, output):
 	study = {}
 	study["type"] = "Study"
 	study["submitter_id"] = phs
+	study["projects"] = {}
+	study["projects"]["submitter_id"] = phs.split(".")[0]
 	studyData.append(study)
 	fileName = output + "/Study.json"
 	with open(fileName, "w+") as o:
 		o.write(json.dumps(studyData))
+
 
 
 def parseSubjects(fileName, nodeName, consent, output):
@@ -205,6 +231,10 @@ files = glob.glob(fileFind)
 print("Outputting to", output, "directory")
 
 # Write initial study node. Only contains one field of submitter id that is the phs of the project
+print("Writing data file for: Program")
+writeProgramNode(output)
+print("Writing data file for: Project")
+writeProjectNode(phs, output)
 print("Writing data file for: Study")
 writeStudyNode(phs, output)
 

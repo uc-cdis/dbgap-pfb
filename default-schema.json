@@ -64,6 +64,181 @@
       "description": "A 128-bit identifier. Depending on the mechanism used to generate it, it is either guaranteed to be different from all other UUIDs/GUIDs generated until 3400 AD or extremely likely to be different. Its relatively small size lends itself well to sorting, ordering, and hashing of all sorts, storing in databases, simple allocation, and ease of programming in general.\n"
     }
   },
+  "program": {
+    "description": "A broad framework of goals to be achieved. (NCIt C52647)\n",
+    "links": [],
+    "uniqueKeys": [
+      [
+        "id"
+      ],
+      [
+        "name"
+      ]
+    ],
+    "validators": null,
+    "id": "program",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "properties": {
+      "dbgap_accession_number": {
+        "type": "string",
+        "description": "The dbgap accession number provided for the program."
+      },
+      "type": {
+        "type": "string"
+      },
+      "id": {
+        "systemAlias": "node_id",
+        "$ref": "_definitions.yaml#/UUID"
+      },
+      "name": {
+        "type": "string",
+        "description": "Full name/title of the program."
+      }
+    },
+    "category": "administrative",
+    "title": "Program",
+    "systemProperties": [
+      "id"
+    ],
+    "required": [
+      "name",
+      "dbgap_accession_number"
+    ],
+    "submittable": false,
+    "project": "*",
+    "program": "*",
+    "additionalProperties": false,
+    "type": "object"
+  },
+  "project": {
+    "description": "Any specifically defined piece of work that is undertaken or attempted to meet a single requirement. (NCIt C47885)\n",
+    "links": [
+      {
+        "backref": "projects",
+        "name": "programs",
+        "multiplicity": "many_to_one",
+        "required": true,
+        "target_type": "program",
+        "label": "member_of"
+      }
+    ],
+    "uniqueKeys": [
+      [
+        "id"
+      ],
+      [
+        "code"
+      ]
+    ],
+    "validators": null,
+    "id": "project",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "properties": {
+      "date_collected": {
+        "type": "string",
+        "description": "The date or date range in which the project data was collected."
+      },
+      "code": {
+        "type": "string",
+        "description": "Unique identifier for the project."
+      },
+      "intended_release_date": {
+        "type": "string",
+        "description": "Tracks a Project's intended release date.",
+        "format": "date-time"
+      },
+      "support_id": {
+        "type": "string",
+        "description": "The ID of the source providing support/grant resources."
+      },
+      "releasable": {
+        "default": false,
+        "type": "boolean",
+        "description": "A project can only be released by the user when `releasable` is true.\n"
+      },
+      "released": {
+        "default": false,
+        "type": "boolean",
+        "description": "To release a project is to tell the GDC to include all submitted\nentities in the next GDC index.\n"
+      },
+      "availability_type": {
+        "enum": [
+          "Open",
+          "Restricted"
+        ],
+        "description": "Is the project open or restricted?"
+      },
+      "dbgap_accession_number": {
+        "type": "string",
+        "description": "The dbgap accession number provided for the project."
+      },
+      "id": {
+        "systemAlias": "node_id",
+        "description": "UUID for the project.",
+        "$ref": "_definitions.yaml#/UUID"
+      },
+      "name": {
+        "type": "string",
+        "description": "Display name/brief description for the project."
+      },
+      "programs": {
+        "description": "Indicates that the project is logically part of the indicated project.\n",
+        "$ref": "_definitions.yaml#/to_one"
+      },
+      "investigator_affiliation": {
+        "type": "string",
+        "description": "The investigator's affiliation with respect to a research institution."
+      },
+      "availability_mechanism": {
+        "type": "string",
+        "description": "Mechanism by which the project will be made avilable."
+      },
+      "support_source": {
+        "type": "string",
+        "description": "The name of source providing support/grant resources."
+      },
+      "state": {
+        "default": "open",
+        "enum": [
+          "open",
+          "review",
+          "submitted",
+          "processing",
+          "closed",
+          "legacy"
+        ],
+        "description": "The possible states a project can be in.  All but `open` are\nequivalent to some type of locked state.\n"
+      },
+      "investigator_name": {
+        "type": "string",
+        "description": "Name of the principal investigator for the project."
+      },
+      "type": {
+        "type": "string"
+      }
+    },
+    "category": "administrative",
+    "title": "Project",
+    "systemProperties": [
+      "id",
+      "state",
+      "released",
+      "releasable",
+      "intended_release_date"
+    ],
+    "required": [
+      "code",
+      "name",
+      "dbgap_accession_number",
+      "programs"
+    ],
+    "submittable": true,
+    "project": "*",
+    "program": "*",
+    "additionalProperties": false,
+    "type": "object",
+    "constraints": null
+  },
   "Study": {
     "id": "Study",
     "title": "Study",
@@ -80,6 +255,15 @@
         "type": "string"
       }
     },
-    "links": []
+    "links": [
+      {
+        "backref": "studies",
+        "name": "projects",
+        "multiplicity": "many_to_one",
+        "required": true,
+        "target_type": "project",
+        "label": "member_of"
+      }
+    ]
   }
 }
