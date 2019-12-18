@@ -90,10 +90,6 @@ def parse_dbgap_dictionary(name, dictionary, filename):
 				
 				props["properties"][item[0].text][tag] = value
 			if enums != {}:
-				enums[""] = "Null"
-				enums[" "] = "Null"
-				enums["NEVER DONE BEFORE"] = "Null"
-				enums["-9"] = "Null"
 				# props["properties"][item[0].text]["enum"] = list(enums.keys())
 				# props["properties"][item[0].text]["enumDef"] = []
 				dictionary["_terms.yaml"][item[0].text]["termDef"]["enumerated_values"] = []
