@@ -80,7 +80,8 @@ def parse_dbgap_dictionary(name, dictionary, filename):
 					continue
 				
 				# if we have a value tag then we know that we will have enumerated vaules 
-				if tag == "value":
+				if tag == "value" and child.attrib != {}:
+					# print(child.attrib['code'])
 					enums[child.attrib["code"]] = child.text
 
 				if child.attrib != {}:
@@ -89,8 +90,12 @@ def parse_dbgap_dictionary(name, dictionary, filename):
 				
 				props["properties"][item[0].text][tag] = value
 			if enums != {}:
-				props["properties"][item[0].text]["enum"] = list(enums.keys())
-				props["properties"][item[0].text]["enumDef"] = []
+				enums[""] = "Null"
+				enums[" "] = "Null"
+				enums["NEVER DONE BEFORE"] = "Null"
+				enums["-9"] = "Null"
+				# props["properties"][item[0].text]["enum"] = list(enums.keys())
+				# props["properties"][item[0].text]["enumDef"] = []
 				dictionary["_terms.yaml"][item[0].text]["termDef"]["enumerated_values"] = []
 				for e in enums:
 					enum = {}
@@ -98,11 +103,10 @@ def parse_dbgap_dictionary(name, dictionary, filename):
 					enum["value"] = enums[e]
 					dictionary["_terms.yaml"][item[0].text]["termDef"]["enumerated_values"].append(enum)
 
-				del props["properties"][item[0].text]["type"]
-				del props["properties"][item[0].text]["value"]
+				# del props["properties"][item[0].text]["type"]
+				# del props["properties"][item[0].text]["value"]
 
-			else:
-				props["properties"][item[0].text]["type"] = "string"
+			props["properties"][item[0].text]["type"] = "string"
 
 			props["properties"][item[0].text]["term"] = {}
 			props["properties"][item[0].text]["term"]["$ref"] = "_terms.yaml#/"+item[0].text
