@@ -99,7 +99,7 @@ def parse_dbgap_dictionary(name, dictionary, filename):
 					dictionary["_terms.yaml"][item[0].text]["termDef"]["enumerated_values"].append(enum)
 
 				# del props["properties"][item[0].text]["type"]
-				# del props["properties"][item[0].text]["value"]
+				del props["properties"][item[0].text]["value"]
 
 			for tag in props["properties"][item[0].text]:
 				if tag != "name" or tag != "value":
