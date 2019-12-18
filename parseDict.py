@@ -19,11 +19,16 @@ def parse_dbgap_dictionary(name, dictionary, filename):
 		tree = ET.parse(f)
 		root = tree.getroot()
 
+		tableName = filename.split('/')[-1]
+		nodeName = filename.split(".")[4]
+
 		# create dictionary structure
 		props = {}
 		props["id"] = name
 		props["title"] = name
 		props["validators"] = None
+		props["term"] = {}
+		props["term"]["$ref"] = "_terms.yaml#/" + nodeName
 		props["$schema"] = "http://json-schema.org/draft-04/schema#"
 		props["type"] = "object"
 		props["category"] = "clinical"
@@ -32,23 +37,80 @@ def parse_dbgap_dictionary(name, dictionary, filename):
 		props["additionalProperties"] = False
 		props["properties"] = {}
 
+
+		# setting up table values in metadata
+		dictionary["_terms.yaml"][nodeName] = {}
+		dictionary["_terms.yaml"][nodeName]["termDef"] = {}
+		for i in root.attrib:
+			dictionary["_terms.yaml"][nodeName]["termDef"][i] = root.attrib[i]
+
+		# initializing a dictionary to hold variable names and phv key pairs
+		variables = {}
+
+		for child in root:
+			# Get table descriptions
+			if child.tag == "description" and child.text != None:
+				dictionary["_terms.yaml"][nodeName]["termDef"]["description"] = child.text
+
+			# Get variable PHV values
+			if child.tag == "variable":
+				for c in child:
+					if c.tag == "name":
+						variables[c.text] = child.attrib["id"]
+						dictionary["_terms.yaml"][c.text] = {}
+						dictionary["_terms.yaml"][c.text]["termDef"] = {} 
+						dictionary["_terms.yaml"][c.text]["termDef"]["id"] = child.attrib["id"] 
+
+
 		# parse xml structure
 		for item in root.findall('./variable'):
 			# get the name of the variable in dictionary
 			props["properties"][item[0].text] = {}
 			
+			# need to handle enumerated values if need be
+			enums = {}
+
 			# loop through the variable properties
 			for child in item:
 				attribute = None
 				tag = child.tag
+
+				# if tag is name we can skip
 				if tag == "name":
 					continue
+				
+				# if we have a value tag then we know that we will have enumerated vaules 
+				if tag == "value":
+					enums[child.attrib["code"]] = child.text
+
 				if child.attrib != {}:
 					attribute = child.attrib
 				value = child.text
 				
 				props["properties"][item[0].text][tag] = value
-			props["properties"][item[0].text]["type"] = "string"
+			if enums != {}:
+				props["properties"][item[0].text]["enum"] = list(enums.keys())
+				props["properties"][item[0].text]["enumDef"] = []
+				dictionary["_terms.yaml"][item[0].text]["termDef"]["enumerated_values"] = []
+				for e in enums:
+					enum = {}
+					enum["enumeration"] = e
+					enum["value"] = enums[e]
+					dictionary["_terms.yaml"][item[0].text]["termDef"]["enumerated_values"].append(enum)
+
+				del props["properties"][item[0].text]["type"]
+				del props["properties"][item[0].text]["value"]
+
+			else:
+				props["properties"][item[0].text]["type"] = "string"
+
+			props["properties"][item[0].text]["term"] = {}
+			props["properties"][item[0].text]["term"]["$ref"] = "_terms.yaml#/"+item[0].text
+
+			if props["properties"][item[0].text]["description"]:
+				dictionary["_terms.yaml"][item[0].text]["termDef"]["description"] = props["properties"][item[0].text]["description"]
+
+
 
 		props["properties"]["dbGaP_Subject_ID"] = {}
 		props["properties"]["dbGaP_Subject_ID"]["description"] = "dbGaP subject variable"
@@ -122,6 +184,5 @@ for f in files:
 with open(outputSchema, "w+") as w:
 	print("Writing to " + outputSchema)
 	w.write(json.dumps(dictionary))
-# print(json.dumps(dictionary))
 
 
