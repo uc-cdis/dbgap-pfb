@@ -84,7 +84,6 @@ def parse_dbgap_dictionary(name, dictionary, filename):
 					if child.attrib != {}:
 						enums[child.attrib["code"]] = child.text
 					else:
-						print("we got here!!: ", item[0].text)
 						enums[child.text] = child.text
 
 				if child.attrib != {}:
