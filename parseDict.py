@@ -25,7 +25,7 @@ def parse_dbgap_dictionary(name, dictionary, filename, variable_report, consent_
 			root = tree.getroot()
 
 			tableName = filename.split('/')[-1]
-			nodeName = filename.split(".")[4]
+			nodeName = tableName.split(".")[4]
 
 			# setup variable report for table and variables
 			var_report = json.loads(v.read())
@@ -83,7 +83,7 @@ def parse_dbgap_dictionary(name, dictionary, filename, variable_report, consent_
 
 							# include the varible report information into the metadata
 							dictionary["_terms.yaml"][c.text]["termDef"]["var_reports"] = []
-							
+
 							var_id = str(child.attrib["id"]) + ".p" + participant_set
 							if var_id in report_variables:
 								dictionary["_terms.yaml"][c.text]["termDef"]["var_reports"].append(str(report_variables[var_id]))
