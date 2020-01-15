@@ -26,6 +26,7 @@ def parse_dbgap_dictionary(name, dictionary, filename, variable_report, consent_
 
 			tableName = filename.split('/')[-1]
 			nodeName = tableName.split(".")[4]
+			tableID = tableName.split(".")[2]
 
 			# setup variable report for table and variables
 			var_report = json.loads(v.read())
@@ -37,6 +38,7 @@ def parse_dbgap_dictionary(name, dictionary, filename, variable_report, consent_
 			for var in node_report["data_table"]["variable"]:
 				report_variables[var["id"]] = var
 
+			# delete the variables so that we only have the table information left
 			del node_report["data_table"]["variable"]
 
 			# create dictionary structure
@@ -45,7 +47,7 @@ def parse_dbgap_dictionary(name, dictionary, filename, variable_report, consent_
 			props["title"] = name
 			props["validators"] = None
 			props["term"] = {}
-			props["term"]["$ref"] = "_terms.yaml#/" + nodeName
+			props["term"]["$ref"] = "_terms.yaml#/" + tableID
 			props["$schema"] = "http://json-schema.org/draft-04/schema#"
 			props["type"] = "object"
 			props["category"] = "clinical"
@@ -56,13 +58,13 @@ def parse_dbgap_dictionary(name, dictionary, filename, variable_report, consent_
 
 
 			# setting up table values in metadata
-			dictionary["_terms.yaml"][nodeName] = {}
-			dictionary["_terms.yaml"][nodeName]["termDef"] = {}
+			dictionary["_terms.yaml"][tableID] = {}
+			dictionary["_terms.yaml"][tableID]["termDef"] = {}
 			for i in root.attrib:
-				dictionary["_terms.yaml"][nodeName]["termDef"][i] = root.attrib[i]
+				dictionary["_terms.yaml"][tableID]["termDef"][i] = root.attrib[i]
 
 			# put table information from variable report into metadata
-			dictionary["_terms.yaml"][nodeName]["termDef"]["var_reports"] = str(node_report)
+			dictionary["_terms.yaml"][tableID]["termDef"]["var_reports"] = str(node_report).replace("\"","")
 
 			# initializing a dictionary to hold variable names and phv key pairs
 			variables = {}
@@ -70,36 +72,39 @@ def parse_dbgap_dictionary(name, dictionary, filename, variable_report, consent_
 			for child in root:
 				# Get table descriptions
 				if child.tag == "description" and child.text != None:
-					dictionary["_terms.yaml"][nodeName]["termDef"]["description"] = child.text
+					dictionary["_terms.yaml"][tableID]["termDef"]["description"] = child.text
 
 				# Get variable PHV values
 				if child.tag == "variable":
 					for c in child:
 						if c.tag == "name":
 							variables[c.text] = child.attrib["id"]
-							dictionary["_terms.yaml"][c.text] = {}
-							dictionary["_terms.yaml"][c.text]["termDef"] = {} 
-							dictionary["_terms.yaml"][c.text]["termDef"]["id"] = child.attrib["id"] 
+							dictionary["_terms.yaml"][child.attrib["id"]] = {}
+							dictionary["_terms.yaml"][child.attrib["id"]]["termDef"] = {} 
+							dictionary["_terms.yaml"][child.attrib["id"]]["termDef"]["id"] = child.attrib["id"] 
 
 							# include the varible report information into the metadata
-							dictionary["_terms.yaml"][c.text]["termDef"]["var_reports"] = []
+							dictionary["_terms.yaml"][child.attrib["id"]]["termDef"]["var_reports"] = []
 
 							var_id = str(child.attrib["id"]) + ".p" + participant_set
 							if var_id in report_variables:
-								dictionary["_terms.yaml"][c.text]["termDef"]["var_reports"].append(str(report_variables[var_id]))
+								dictionary["_terms.yaml"][child.attrib["id"]]["termDef"]["var_reports"].append(str(report_variables[var_id]).replace("\"",""))
 
 							var_id = str(child.attrib["id"]) + ".p" + participant_set + ".c" + consent_val 
 							if var_id in report_variables:
-								dictionary["_terms.yaml"][c.text]["termDef"]["var_reports"].append(str(report_variables[var_id]))
+								dictionary["_terms.yaml"][child.attrib["id"]]["termDef"]["var_reports"].append(str(report_variables[var_id]).replace("\"",""))
 
 
 
 
 			# parse xml structure
 			for item in root.findall('./variable'):
+				# used for the PHV value of the variable for linking of the metadata
+				variableID = item.attrib["id"]
+
 				# get the name of the variable in dictionary
 				props["properties"][item[0].text] = {}
-				
+
 				# need to handle enumerated values if need be
 				enums = {}
 
@@ -125,29 +130,31 @@ def parse_dbgap_dictionary(name, dictionary, filename, variable_report, consent_
 					
 					props["properties"][item[0].text][tag] = value
 				if enums != {}:
-					dictionary["_terms.yaml"][item[0].text]["termDef"]["enumerated_values"] = []
+					# write the enums to the metadata
+					dictionary["_terms.yaml"][variableID]["termDef"]["enumerated_values"] = []
 					for e in enums:
 						enum = {}
 						enum["enumeration"] = e
 						enum["value"] = enums[e]
-						dictionary["_terms.yaml"][item[0].text]["termDef"]["enumerated_values"].append(enum)
+						dictionary["_terms.yaml"][variableID]["termDef"]["enumerated_values"].append(enum)
 
 					del props["properties"][item[0].text]["value"]
 
 				for tag in props["properties"][item[0].text]:
+					# write info of variable to metadata
 					if tag != "name" or tag != "value":
 						if tag == "type":
-							dictionary["_terms.yaml"][item[0].text]["termDef"]["dbgapType"] = props["properties"][item[0].text][tag]
+							dictionary["_terms.yaml"][variableID]["termDef"]["dbgapType"] = props["properties"][item[0].text][tag]
 						else:
-							dictionary["_terms.yaml"][item[0].text]["termDef"][tag] = props["properties"][item[0].text][tag]
+							dictionary["_terms.yaml"][variableID]["termDef"][tag] = props["properties"][item[0].text][tag]
 
 				if props["properties"][item[0].text]["description"]:
-					dictionary["_terms.yaml"][item[0].text]["termDef"]["description"] = props["properties"][item[0].text]["description"]
+					dictionary["_terms.yaml"][variableID]["termDef"]["description"] = props["properties"][item[0].text]["description"]
 
 				props["properties"][item[0].text]["type"] = "string"
 
 				props["properties"][item[0].text]["term"] = {}
-				props["properties"][item[0].text]["term"]["$ref"] = "_terms.yaml#/"+item[0].text
+				props["properties"][item[0].text]["term"]["$ref"] = "_terms.yaml#/" + variableID
 
 			props["properties"]["dbGaP_Subject_ID"] = {}
 			props["properties"]["dbGaP_Subject_ID"]["description"] = "dbGaP subject variable"
@@ -222,6 +229,6 @@ for f in files:
 
 with open(outputSchema, "w+") as w:
 	print("Writing to " + outputSchema)
-	w.write(json.dumps(dictionary))
+	w.write(json.dumps(dictionary, indent=2))
 
 
