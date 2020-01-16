@@ -64,7 +64,7 @@ def parse_dbgap_dictionary(name, dictionary, filename, variable_report, consent_
 				dictionary["_terms.yaml"][tableID]["termDef"][i] = root.attrib[i]
 
 			# put table information from variable report into metadata
-			dictionary["_terms.yaml"][tableID]["termDef"]["var_reports"] = str(node_report).replace("\"","`")
+			dictionary["_terms.yaml"][tableID]["termDef"]["var_reports"] = str(node_report)
 
 			# initializing a dictionary to hold variable names and phv key pairs
 			variables = {}
@@ -88,11 +88,11 @@ def parse_dbgap_dictionary(name, dictionary, filename, variable_report, consent_
 
 							var_id = str(child.attrib["id"]) + ".p" + participant_set
 							if var_id in report_variables:
-								dictionary["_terms.yaml"][child.attrib["id"]]["termDef"]["var_reports"].append(str(report_variables[var_id]).replace("\"","`"))
+								dictionary["_terms.yaml"][child.attrib["id"]]["termDef"]["var_reports"].append(str(report_variables[var_id]))
 
 							var_id = str(child.attrib["id"]) + ".p" + participant_set + ".c" + consent_val 
 							if var_id in report_variables:
-								dictionary["_terms.yaml"][child.attrib["id"]]["termDef"]["var_reports"].append(str(report_variables[var_id]).replace("\"","`"))
+								dictionary["_terms.yaml"][child.attrib["id"]]["termDef"]["var_reports"].append(str(report_variables[var_id]))
 
 
 
